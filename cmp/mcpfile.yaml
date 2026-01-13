@@ -1,20 +1,22 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/genmcp/gen-mcp/refs/heads/main/specs/mcpfile-schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/rrbanda/gen-mcp/refs/heads/main/specs/mcpfile-schema.json
 kind: MCPToolDefinitions
 schemaVersion: "0.2.0"
-name: cmp-tools
+name: process-tools
 version: "1.0.0"
 instructions: |
-  This MCP server provides tools for the CMP (Certificate Management Platform) ecosystem.
+  This MCP server provides tools for process automation - calling backend APIs for various workflows.
   
   Available tool categories:
   - Certificate Orders: Create and manage certificate requests
-  - (Future) Other CMP tools can be added here
+  - (Extensible) Add more tools for any API-driven process
   
   Authentication:
-  All CMP tools require the same authentication:
-  - username: Your CMP username
+  All tools use the same authentication mechanism:
+  - username: Your username
   - token: Your authentication token
   - smUserDev: Your SM_USER_DEV identifier
+  
+  To add new tools, define them in this file with their input schema and invocation details.
 
 invocationBases:
   # =============================================================================

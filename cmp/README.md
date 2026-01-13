@@ -1,6 +1,15 @@
-# CMP MCP Server
+# Process Automation MCP Server
 
-An MCP (Model Context Protocol) server that exposes Certificate Management Platform (CMP) APIs as tools for AI assistants. Built with [GenMCP](https://github.com/genmcp/gen-mcp) - zero code required.
+An MCP (Model Context Protocol) server that exposes backend APIs as tools for AI assistants. Built with [GenMCP](https://github.com/rrbanda/gen-mcp) - zero code required.
+
+## What This Server Does
+
+This MCP server provides tools for **process automation** - any workflow that involves calling backend APIs. Current tools include:
+
+- **Certificate Management**: Create certificate orders, check status
+- **(Extensible)**: Add tools for any API-driven process (approvals, provisioning, service requests, etc.)
+
+The server is designed to be easily extended with new tools without writing code - just add YAML configurations.
 
 ---
 

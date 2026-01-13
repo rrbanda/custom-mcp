@@ -8,10 +8,10 @@ data:
   mcpfile.yaml: |
     kind: MCPToolDefinitions
     schemaVersion: "0.2.0"
-    name: cmp-tools
+    name: process-tools
     version: "1.0.0"
     instructions: |
-      This MCP server provides tools for the CMP ecosystem.
+      This MCP server provides tools for process automation - calling backend APIs.
       All tools require: username, token, smUserDev for authentication.
 
     invocationBases:

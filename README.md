@@ -1,6 +1,16 @@
 # Custom MCP Servers
 
-This repository contains custom MCP (Model Context Protocol) server configurations built with [GenMCP](https://github.com/genmcp/gen-mcp). These configurations expose backend APIs as tools for AI assistants - **zero code required**.
+This repository contains custom MCP (Model Context Protocol) server configurations built with [GenMCP](https://github.com/rrbanda/gen-mcp). These configurations expose backend APIs as tools for AI assistants - **zero code required**.
+
+## Purpose
+
+This MCP server is designed for **process automation** - any workflow that requires calling backend APIs can be exposed as tools for AI assistants. Examples include:
+
+- Certificate management (ordering, renewal, status checks)
+- Infrastructure provisioning
+- Approval workflows
+- Service requests
+- Any API-driven business process
 
 ---
 
@@ -8,7 +18,7 @@ This repository contains custom MCP (Model Context Protocol) server configuratio
 
 | Server | Description | Directory |
 |--------|-------------|-----------|
-| **CMP** | Certificate Management Platform tools | [`cmp/`](./cmp/) |
+| **Process Tools** | Multi-purpose process automation tools | [`cmp/`](./cmp/) |
 
 ---
 
@@ -49,14 +59,14 @@ genmcp version
 
 ## Quick Start
 
-### Run CMP MCP Server Locally
+### Run MCP Server Locally
 
 ```bash
-# Navigate to the CMP server
+# Navigate to the process tools server
 cd cmp
 
-# Set your backend URL
-export CMP_BACKEND_URL="https://your-cmp-api.company.com"
+# Set your backend URL (the API server your tools will call)
+export CMP_BACKEND_URL="https://your-backend-api.company.com"
 
 # Start the server
 genmcp run
@@ -78,7 +88,7 @@ curl -X POST http://localhost:8080/mcp \
 
 For detailed documentation on each MCP server, see:
 
-- **CMP Server**: [`cmp/README.md`](./cmp/README.md)
+- **Process Tools Server**: [`cmp/README.md`](./cmp/README.md)
 
 ---
 
