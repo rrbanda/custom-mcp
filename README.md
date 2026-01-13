@@ -25,19 +25,24 @@ Before using any MCP server in this repo, you need:
 
 ### Install GenMCP CLI
 
+> **Important**: This project requires GenMCP with schemaVersion 0.2.0 support.  
+> You must build from source (the released v0.1.x does NOT work).
+
 ```bash
-# Clone GenMCP repository
-git clone https://github.com/genmcp/gen-mcp.git
+# Clone GenMCP repository (use this specific repo)
+git clone https://github.com/rrbanda/gen-mcp.git
 cd gen-mcp
 
 # Build the CLI
 make build-cli
 
-# Move to a directory in your PATH
+# Move to a directory in your PATH (replaces any old version)
 sudo mv genmcp /usr/local/bin/
 
-# Verify installation
+# Verify installation - should show "development" version
 genmcp version
+# Expected output: genmcp version development@<hash>
+# If you see "v0.1.x", you have the old version - rebuild from source!
 ```
 
 ---

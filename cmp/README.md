@@ -29,19 +29,29 @@ An MCP (Model Context Protocol) server that exposes Certificate Management Platf
 
 ### Install GenMCP CLI
 
+> **Important**: This project requires GenMCP with schemaVersion 0.2.0 support.  
+> The released version (v0.1.x) does NOT work. You must build from source.
+
 ```bash
-# Clone GenMCP repository
-git clone https://github.com/genmcp/gen-mcp.git
+# Clone GenMCP repository (use this specific repo)
+git clone https://github.com/rrbanda/gen-mcp.git
 cd gen-mcp
 
 # Build the CLI
 make build-cli
 
-# Move to a directory in your PATH
+# Move to a directory in your PATH (replaces any old version)
 sudo mv genmcp /usr/local/bin/
 
-# Verify installation
+# Verify installation - should show "development" version
 genmcp version
+# Expected: genmcp version development@<hash>
+```
+
+**Verify version works with 0.2.0 schema:**
+```bash
+genmcp version
+# If you see "v0.1.x", you have the old version - rebuild from source!
 ```
 
 ---
@@ -64,12 +74,18 @@ podman --version
 
 ### Step 2: Install GenMCP CLI
 
+> **Important**: Must build from source to get schemaVersion 0.2.0 support.
+
 ```bash
-# Clone and build GenMCP
-git clone https://github.com/genmcp/gen-mcp.git
+# Clone GenMCP (this specific repo has 0.2.0 support)
+git clone https://github.com/rrbanda/gen-mcp.git
 cd gen-mcp
 make build-cli
+
+# Install to PATH (replaces any old version)
 sudo mv genmcp /usr/local/bin/
+
+# Verify - should show "development" version, NOT "v0.1.x"
 genmcp version
 ```
 
@@ -393,6 +409,19 @@ oc rollout restart deployment/cmp-mcp-server
 ---
 
 ## Troubleshooting
+
+### "invalid mcp file version, expected 0.1.0"
+
+**Cause**: You have an old version of genmcp (v0.1.x) that doesn't support schemaVersion 0.2.0.
+
+**Fix**: Rebuild genmcp from source:
+```bash
+cd gen-mcp  # wherever you cloned it
+git pull
+make build-cli
+sudo mv genmcp /usr/local/bin/
+genmcp version  # Should show "development@..." not "v0.1.x"
+```
 
 ### Pod keeps restarting
 
