@@ -103,6 +103,39 @@ data:
             extend:
               url: "/createOrder"
 
+      - name: get_certificate_status
+        title: "Get Certificate Status"
+        description: |
+          Retrieves the current status of a certificate order.
+          Use this to check if an order has been approved or get processing state.
+        inputSchema:
+          type: object
+          properties:
+            username:
+              type: string
+              description: "Your CMP username"
+            token:
+              type: string
+              description: "Authentication token for the CMP API"
+            smUserDev:
+              type: string
+              description: "SM_USER_DEV identifier"
+            orderId:
+              type: string
+              description: "The order ID to check status for (e.g., ORD-12345)"
+          required:
+            - username
+            - token
+            - smUserDev
+            - orderId
+        invocation:
+          extends:
+            from: baseCertOrders
+            extend:
+              url: "/{orderId}/status"
+            override:
+              method: GET
+
       # Add more tools here...
 
   mcpserver.yaml: |

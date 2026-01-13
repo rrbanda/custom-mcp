@@ -177,35 +177,53 @@ tools:
           url: "/createOrder"
 
   # ===========================================================================
+  # GET CERTIFICATE STATUS
+  # ===========================================================================
+  - name: get_certificate_status
+    title: "Get Certificate Status"
+    description: |
+      Retrieves the current status of a certificate order.
+      
+      Use this tool when you need to:
+      - Check if a certificate order has been approved
+      - Get the current processing state
+      - Retrieve order details
+      
+      Returns the order status, creation date, and any error messages.
+    inputSchema:
+      type: object
+      properties:
+        # --- AUTH FIELDS (required for all tools) ---
+        username:
+          type: string
+          description: "Your CMP username"
+        token:
+          type: string
+          description: "Authentication token for the CMP API"
+        smUserDev:
+          type: string
+          description: "SM_USER_DEV identifier"
+        # --- TOOL-SPECIFIC FIELDS ---
+        orderId:
+          type: string
+          description: "The order ID to check status for (e.g., ORD-12345)"
+      required:
+        - username
+        - token
+        - smUserDev
+        - orderId
+    invocation:
+      extends:
+        from: baseCertOrders
+        extend:
+          url: "/{orderId}/status"
+        override:
+          method: GET
+
+  # ===========================================================================
   # ADD MORE TOOLS HERE
   # ===========================================================================
-  # Example: Get certificate order status
-  #
-  # - name: get_certificate_order
-  #   title: "Get Certificate Order"
-  #   description: "Retrieves the status of a certificate order"
-  #   inputSchema:
-  #     type: object
-  #     properties:
-  #       username:
-  #         type: string
-  #       token:
-  #         type: string
-  #       smUserDev:
-  #         type: string
-  #       orderId:
-  #         type: string
-  #         description: "The order ID to retrieve"
-  #     required: [username, token, smUserDev, orderId]
-  #   invocation:
-  #     extends:
-  #       from: baseCertOrders
-  #       extend:
-  #         url: "/{orderId}"
-  #       override:
-  #         method: GET
-  #
-  # Example: Different CMP type (network provisioning)
+  # Example: Different API type (network provisioning using a different base)
   #
   # - name: create_network_request
   #   title: "Create Network Request"
@@ -226,6 +244,6 @@ tools:
   #     required: [username, token, smUserDev, networkType]
   #   invocation:
   #     extends:
-  #       from: baseNetworkCmp  # Different base for different CMP type
+  #       from: baseNetworkCmp  # Different base for different API type
   #       extend:
   #         url: "/provision"
