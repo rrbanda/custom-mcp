@@ -1,0 +1,229 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/genmcp/gen-mcp/refs/heads/main/specs/mcpfile-schema.json
+kind: MCPToolDefinitions
+schemaVersion: "0.2.0"
+name: cmp-tools
+version: "1.0.0"
+instructions: |
+  This MCP server provides tools for the CMP (Certificate Management Platform) ecosystem.
+  
+  Available tool categories:
+  - Certificate Orders: Create and manage certificate requests
+  - (Future) Other CMP tools can be added here
+  
+  Authentication:
+  All CMP tools require the same authentication:
+  - username: Your CMP username
+  - token: Your authentication token
+  - smUserDev: Your SM_USER_DEV identifier
+
+invocationBases:
+  # =============================================================================
+  # BASE AUTH CONFIG - Shared across ALL CMP tools
+  # =============================================================================
+  # This base provides common auth headers. Tools extend this and add their
+  # specific URL and method.
+  baseCmpAuth:
+    http:
+      method: POST  # Default method, can be overridden
+      url: ${CMP_BACKEND_URL}
+      headers:
+        Content-Type: "application/json"
+        Username: "{username}"
+        Token: "{token}"
+        SM_USER_DEV: "{smUserDev}"
+
+  # =============================================================================
+  # CERTIFICATE ORDERS BASE - For certificate-related operations
+  # =============================================================================
+  baseCertOrders:
+    http:
+      method: POST
+      url: ${CMP_BACKEND_URL}/api/orderextws/public/Orders
+      headers:
+        Content-Type: "application/json"
+        Username: "{username}"
+        Token: "{token}"
+        SM_USER_DEV: "{smUserDev}"
+
+  # =============================================================================
+  # ADD MORE BASES HERE FOR OTHER CMP TYPES
+  # =============================================================================
+  # Example for future CMPs:
+  # 
+  # baseNetworkCmp:
+  #   http:
+  #     method: POST
+  #     url: ${CMP_BACKEND_URL}/api/network/v1
+  #     headers:
+  #       Content-Type: "application/json"
+  #       Username: "{username}"
+  #       Token: "{token}"
+  #       SM_USER_DEV: "{smUserDev}"
+
+# =============================================================================
+# COMMON INPUT SCHEMA FRAGMENTS (for reference when adding new tools)
+# =============================================================================
+# All CMP tools should include these auth fields in their inputSchema:
+#
+#   username:
+#     type: string
+#     description: "Your CMP username"
+#   token:
+#     type: string
+#     description: "Authentication token for the CMP API"
+#   smUserDev:
+#     type: string
+#     description: "SM_USER_DEV identifier"
+#
+# And include them in required: [username, token, smUserDev, ...]
+
+tools:
+  # ===========================================================================
+  # CERTIFICATE ORDER TOOLS
+  # ===========================================================================
+  - name: create_certificate_order
+    title: "Create Certificate Order"
+    description: |
+      Creates a new certificate order in the Certificate Management Platform.
+      
+      This tool submits a certificate request with the specified questionnaire data.
+      Common questionnaire fields include:
+      - Environment (DEV, PROD, etc.)
+      - commonName (the certificate CN)
+      - flatSubjectAlternativeNames (SANs)
+      - templateAliasDEV (certificate template)
+      - ApplicationOwner
+      - location, stateprovince, countryC
+    inputSchema:
+      type: object
+      properties:
+        # --- AUTH FIELDS (common to all CMP tools) ---
+        username:
+          type: string
+          description: "Your CMP username (e.g., RA41425)"
+        token:
+          type: string
+          description: "Authentication token for the CMP API"
+        smUserDev:
+          type: string
+          description: "SM_USER_DEV identifier (e.g., 0000000003)"
+        # --- TOOL-SPECIFIC FIELDS ---
+        orderByGeid:
+          type: string
+          description: "GEID of the person placing the order"
+        orderForGeid:
+          type: string
+          description: "GEID of the person the order is for (can be same as orderByGeid)"
+        productxd:
+          type: string
+          description: "Product identifier (e.g., 1234_1234_GLOBAL)"
+        productName:
+          type: string
+          description: "Product name (e.g., Next Generation - Certificate management)"
+        questionnaire:
+          type: array
+          description: "Array of questionnaire responses for the certificate order"
+          items:
+            type: object
+            properties:
+              dataKey:
+                type: string
+                description: "Unique identifier for the field (e.g., 39673_523779_5458503)"
+              key:
+                type: string
+                description: "Field name (e.g., Environment, commonName, location)"
+              isHidden:
+                type: string
+                description: "Whether the field is hidden (true or false as string)"
+              value:
+                type: array
+                description: "Array containing the field value(s)"
+                items:
+                  type: string
+              searchInput:
+                type: string
+                description: "Optional search input used to find the value"
+              autoPopulated:
+                type: boolean
+                description: "Whether the field was auto-populated"
+            required:
+              - dataKey
+              - key
+              - isHidden
+              - value
+        locationIdOrderFor:
+          type: string
+          description: "Location ID for the order (e.g., 37750)"
+        geoIdOrderFor:
+          type: string
+          description: "Geographic region for the order (e.g., USA)"
+      required:
+        - username
+        - token
+        - smUserDev
+        - orderByGeid
+        - orderForGeid
+        - productxd
+        - productName
+        - questionnaire
+        - locationIdOrderFor
+        - geoIdOrderFor
+    invocation:
+      extends:
+        from: baseCertOrders
+        extend:
+          url: "/createOrder"
+
+  # ===========================================================================
+  # ADD MORE TOOLS HERE
+  # ===========================================================================
+  # Example: Get certificate order status
+  #
+  # - name: get_certificate_order
+  #   title: "Get Certificate Order"
+  #   description: "Retrieves the status of a certificate order"
+  #   inputSchema:
+  #     type: object
+  #     properties:
+  #       username:
+  #         type: string
+  #       token:
+  #         type: string
+  #       smUserDev:
+  #         type: string
+  #       orderId:
+  #         type: string
+  #         description: "The order ID to retrieve"
+  #     required: [username, token, smUserDev, orderId]
+  #   invocation:
+  #     extends:
+  #       from: baseCertOrders
+  #       extend:
+  #         url: "/{orderId}"
+  #       override:
+  #         method: GET
+  #
+  # Example: Different CMP type (network provisioning)
+  #
+  # - name: create_network_request
+  #   title: "Create Network Request"
+  #   description: "Creates a network provisioning request"
+  #   inputSchema:
+  #     type: object
+  #     properties:
+  #       username:
+  #         type: string
+  #       token:
+  #         type: string
+  #       smUserDev:
+  #         type: string
+  #       networkType:
+  #         type: string
+  #       vlanId:
+  #         type: string
+  #     required: [username, token, smUserDev, networkType]
+  #   invocation:
+  #     extends:
+  #       from: baseNetworkCmp  # Different base for different CMP type
+  #       extend:
+  #         url: "/provision"

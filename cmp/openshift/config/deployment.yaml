@@ -1,0 +1,71 @@
+# =============================================================================
+# CMP MCP Server Deployment
+# =============================================================================
+# VALUES TO UPDATE FOR YOUR ENVIRONMENT:
+#   Line 29: image           - Your container registry and image tag
+#   Line 43: CMP_BACKEND_URL - Your CMP backend API URL
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cmp-mcp-server
+  labels:
+    app: cmp-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cmp-mcp-server
+  template:
+    metadata:
+      labels:
+        app: cmp-mcp-server
+    spec:
+      containers:
+      - name: cmp-mcp-server
+        # ┌─────────────────────────────────────────────────────────────────┐
+        # │ UPDATE THIS: Your container image                               │
+        # └─────────────────────────────────────────────────────────────────┘
+        image: quay.io/rbrhssa/mcp-techx:v1.0.1
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        # Config file paths (mounted from ConfigMap - do not change)
+        - name: MCP_FILE_PATH
+          value: /etc/config/mcpfile.yaml
+        - name: MCP_SERVER_CONFIG_PATH
+          value: /etc/config/mcpserver.yaml
+        # ┌─────────────────────────────────────────────────────────────────┐
+        # │ UPDATE THIS: Your CMP backend API URL                           │
+        # │ This is the base URL for all CMP API calls                      │
+        # │ Example: https://cmp-api.your-company.com                       │
+        # └─────────────────────────────────────────────────────────────────┘
+        - name: CMP_BACKEND_URL
+          value: "https://REPLACE-WITH-YOUR-CMP-API-URL"
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        # MCP endpoint uses POST only (JSON-RPC), so use TCP socket probes
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: cmp-mcp-config

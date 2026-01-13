@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cmp-mcp-config
+  labels:
+    app: cmp-mcp-server
+data:
+  mcpfile.yaml: |
+    kind: MCPToolDefinitions
+    schemaVersion: "0.2.0"
+    name: cmp-tools
+    version: "1.0.0"
+    instructions: |
+      This MCP server provides tools for the CMP ecosystem.
+      All tools require: username, token, smUserDev for authentication.
+
+    invocationBases:
+      # Shared auth base - all CMP tools can use this
+      baseCmpAuth:
+        http:
+          method: POST
+          url: ${CMP_BACKEND_URL}
+          headers:
+            Content-Type: "application/json"
+            Username: "{username}"
+            Token: "{token}"
+            SM_USER_DEV: "{smUserDev}"
+
+      # Certificate Orders base
+      baseCertOrders:
+        http:
+          method: POST
+          url: ${CMP_BACKEND_URL}/api/orderextws/public/Orders
+          headers:
+            Content-Type: "application/json"
+            Username: "{username}"
+            Token: "{token}"
+            SM_USER_DEV: "{smUserDev}"
+
+      # Add more bases here for other CMP types...
+
+    tools:
+      - name: create_certificate_order
+        title: "Create Certificate Order"
+        description: |
+          Creates a new certificate order in the CMP.
+          Questionnaire fields: Environment, commonName, SANs, template, etc.
+        inputSchema:
+          type: object
+          properties:
+            username:
+              type: string
+            token:
+              type: string
+            smUserDev:
+              type: string
+            orderByGeid:
+              type: string
+            orderForGeid:
+              type: string
+            productxd:
+              type: string
+            productName:
+              type: string
+            questionnaire:
+              type: array
+              items:
+                type: object
+                properties:
+                  dataKey:
+                    type: string
+                  key:
+                    type: string
+                  isHidden:
+                    type: string
+                  value:
+                    type: array
+                    items:
+                      type: string
+                  searchInput:
+                    type: string
+                  autoPopulated:
+                    type: boolean
+                required: [dataKey, key, isHidden, value]
+            locationIdOrderFor:
+              type: string
+            geoIdOrderFor:
+              type: string
+          required:
+            - username
+            - token
+            - smUserDev
+            - orderByGeid
+            - orderForGeid
+            - productxd
+            - productName
+            - questionnaire
+            - locationIdOrderFor
+            - geoIdOrderFor
+        invocation:
+          extends:
+            from: baseCertOrders
+            extend:
+              url: "/createOrder"
+
+      # Add more tools here...
+
+  mcpserver.yaml: |
+    kind: MCPServerConfig
+    schemaVersion: "0.2.0"
+    runtime:
+      transportProtocol: streamablehttp
+      streamableHttpConfig:
+        port: 8080
+        basePath: /mcp
+      loggingConfig:
+        level: info
+        encoding: json
+        enableMcpLogs: true
