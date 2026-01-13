@@ -260,17 +260,30 @@ cmp/
 
 ## Deploy to OpenShift
 
-### Step 1: Build and push container image
+This section walks through deploying the MCP server to OpenShift/Kubernetes.
+
+> **No Dockerfile needed!** The `genmcp build` command creates a container image directly from your YAML config files. It embeds `mcpfile.yaml` and `mcpserver.yaml` into the image along with the GenMCP server binary.
+
+### Step 1: Build container image
 
 ```bash
 cd cmp
 
-# Build the container image
+# Build the container image (genmcp generates everything internally)
 genmcp build \
   --tag quay.io/YOUR-ORG/cmp-mcp:v1.0.0 \
   -f mcpfile.yaml \
   --platform linux/amd64
+```
 
+**What `genmcp build` does:**
+- Creates a minimal container with the GenMCP server binary
+- Embeds your `mcpfile.yaml` and `mcpserver.yaml`
+- No Dockerfile required - it's all handled for you
+
+### Step 2: Push image to registry
+
+```bash
 # Login to your container registry
 podman login quay.io
 
@@ -278,7 +291,9 @@ podman login quay.io
 podman push quay.io/YOUR-ORG/cmp-mcp:v1.0.0
 ```
 
-### Step 2: Update configuration
+> **Alternative**: Use the pre-built image `quay.io/rbrhssa/mcp-techx:v1.0.1` to skip Steps 1-2.
+
+### Step 3: Update deployment configuration
 
 Edit `openshift/config/deployment.yaml` and update these TWO values:
 
@@ -291,13 +306,13 @@ image: quay.io/YOUR-ORG/cmp-mcp:v1.0.0
   value: "https://your-cmp-api.company.com"
 ```
 
-### Step 3: Login to OpenShift
+### Step 4: Login to OpenShift
 
 ```bash
 oc login --token=<your-token> --server=<your-cluster-api>
 ```
 
-### Step 4: Create project and deploy
+### Step 5: Create project and deploy
 
 ```bash
 oc new-project cmp-mcp
@@ -309,14 +324,14 @@ oc apply -f openshift/config/service.yaml
 oc apply -f openshift/config/route.yaml
 ```
 
-### Step 5: Verify deployment
+### Step 6: Verify deployment
 
 ```bash
 oc get pods
 oc get route cmp-mcp-server -o jsonpath='{.spec.host}'
 ```
 
-### Step 6: Test deployed server
+### Step 7: Test deployed server
 
 ```bash
 ROUTE=$(oc get route cmp-mcp-server -o jsonpath='{.spec.host}')
