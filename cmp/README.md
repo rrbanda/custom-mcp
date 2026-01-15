@@ -295,8 +295,8 @@ GenMCP provides the server binary that reads these configs.
 │     • get_certificate_status (GET)                              │
 │                                                                 │
 │   When tool is called:                                          │
-│   1. Receives parameters (username, token, questionnaire, etc.) │
-│   2. Adds auth headers (Username, Token, SM_USER_DEV)           │
+│   1. Receives parameters (token, questionnaire, etc.)           │
+│   2. Adds auth headers (CMP_AUTH_TOKEN, Authorization Bearer)   │
 │   3. Forwards to: ${CMP_BACKEND_URL}/api/orderextws/...         │
 │   4. Returns response to client                                 │
 │                                                                 │
@@ -425,16 +425,12 @@ curl -X POST http://localhost:8080/mcp \
     "params":{
       "name":"create_certificate_order",
       "arguments":{
-        "username":"testuser",
         "token":"test-token",
-        "smUserDev":"0000000003",
         "orderByGeid":"1011035821",
         "orderForGeid":"1011035821",
-        "productxd":"1234_1234_GLOBAL",
+        "productId":"39673_523779_GLOBAL",
         "productName":"Test Product",
-        "questionnaire":[{"dataKey":"123","key":"Environment","isHidden":"false","value":["DEV"]}],
-        "locationIdOrderFor":"37750",
-        "geoIdOrderFor":"USA"
+        "questionnaire":[{"dataKey":"123","key":"Environment","IsHidden":"false","value":["DEV"]}]
       }
     }
   }'
@@ -738,24 +734,16 @@ Open `mcpfile.yaml` and add your tool to the `tools` array. Here's a complete ex
     inputSchema:
       type: object
       properties:
-        # --- AUTH FIELDS (required for all tools) ---
-        username:
-          type: string
-          description: "Your CMP username"
+        # --- AUTH FIELD ---
         token:
           type: string
           description: "Authentication token for the CMP API"
-        smUserDev:
-          type: string
-          description: "SM_USER_DEV identifier"
         # --- TOOL-SPECIFIC FIELDS ---
         orderId:
           type: string
           description: "The order ID to check status for (e.g., ORD-12345)"
       required:
-        - username
         - token
-        - smUserDev
         - orderId
     invocation:
       extends:
@@ -842,9 +830,8 @@ invocationBases:
       url: ${CMP_BACKEND_URL}/api/orderextws/public/Orders
       headers:
         Content-Type: "application/json"
-        Username: "{username}"
-        Token: "{token}"
-        SM_USER_DEV: "{smUserDev}"
+        CMP_AUTH_TOKEN: "{token}"
+        Authorization: "Bearer {token}"
 
   # NEW: Base for inventory API
   baseInventory:
@@ -853,9 +840,8 @@ invocationBases:
       url: ${CMP_BACKEND_URL}/api/inventory/v2
       headers:
         Content-Type: "application/json"
-        Username: "{username}"
-        Token: "{token}"
-        SM_USER_DEV: "{smUserDev}"
+        CMP_AUTH_TOKEN: "{token}"
+        Authorization: "Bearer {token}"
 ```
 
 Then reference it in your tool:

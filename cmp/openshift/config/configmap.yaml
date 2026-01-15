@@ -12,7 +12,7 @@ data:
     version: "1.0.0"
     instructions: |
       This MCP server provides tools for process automation - calling backend APIs.
-      All tools require: username, token, smUserDev for authentication.
+      All tools require a token parameter which is sent as CMP_AUTH_TOKEN and Authorization Bearer headers.
 
     invocationBases:
       # Shared auth base - all CMP tools can use this
@@ -22,9 +22,8 @@ data:
           url: ${CMP_BACKEND_URL}
           headers:
             Content-Type: "application/json"
-            Username: "{username}"
-            Token: "{token}"
-            SM_USER_DEV: "{smUserDev}"
+            CMP_AUTH_TOKEN: "{token}"
+            Authorization: "Bearer {token}"
 
       # Certificate Orders base
       baseCertOrders:
@@ -33,9 +32,8 @@ data:
           url: ${CMP_BACKEND_URL}/api/orderextws/public/Orders
           headers:
             Content-Type: "application/json"
-            Username: "{username}"
-            Token: "{token}"
-            SM_USER_DEV: "{smUserDev}"
+            CMP_AUTH_TOKEN: "{token}"
+            Authorization: "Bearer {token}"
 
       # Add more bases here for other CMP types...
 
@@ -48,18 +46,16 @@ data:
         inputSchema:
           type: object
           properties:
-            username:
-              type: string
             token:
               type: string
-            smUserDev:
-              type: string
+              description: "Authentication token for the CMP API"
             orderByGeid:
               type: string
             orderForGeid:
               type: string
-            productxd:
+            productId:
               type: string
+              description: "Product identifier (e.g., 39673_523779_GLOBAL)"
             productName:
               type: string
             questionnaire:
@@ -71,7 +67,7 @@ data:
                     type: string
                   key:
                     type: string
-                  isHidden:
+                  IsHidden:
                     type: string
                   value:
                     type: array
@@ -81,22 +77,14 @@ data:
                     type: string
                   autoPopulated:
                     type: boolean
-                required: [dataKey, key, isHidden, value]
-            locationIdOrderFor:
-              type: string
-            geoIdOrderFor:
-              type: string
+                required: [dataKey, key, IsHidden, value]
           required:
-            - username
             - token
-            - smUserDev
             - orderByGeid
             - orderForGeid
-            - productxd
+            - productId
             - productName
             - questionnaire
-            - locationIdOrderFor
-            - geoIdOrderFor
         invocation:
           extends:
             from: baseCertOrders
@@ -111,22 +99,14 @@ data:
         inputSchema:
           type: object
           properties:
-            username:
-              type: string
-              description: "Your CMP username"
             token:
               type: string
               description: "Authentication token for the CMP API"
-            smUserDev:
-              type: string
-              description: "SM_USER_DEV identifier"
             orderId:
               type: string
               description: "The order ID to check status for (e.g., ORD-12345)"
           required:
-            - username
             - token
-            - smUserDev
             - orderId
         invocation:
           extends:

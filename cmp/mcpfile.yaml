@@ -11,10 +11,9 @@ instructions: |
   - (Extensible) Add more tools for any API-driven process
   
   Authentication:
-  All tools use the same authentication mechanism:
-  - username: Your username
-  - token: Your authentication token
-  - smUserDev: Your SM_USER_DEV identifier
+  All tools require a token parameter which is sent as:
+  - CMP_AUTH_TOKEN header
+  - Authorization: Bearer header
   
   To add new tools, define them in this file with their input schema and invocation details.
 
@@ -22,17 +21,16 @@ invocationBases:
   # =============================================================================
   # BASE AUTH CONFIG - Shared across ALL CMP tools
   # =============================================================================
-  # This base provides common auth headers. Tools extend this and add their
-  # specific URL and method.
+  # This base provides common auth headers matching the actual CMP API format.
+  # Headers: CMP_AUTH_TOKEN and Authorization Bearer token
   baseCmpAuth:
     http:
       method: POST  # Default method, can be overridden
       url: ${CMP_BACKEND_URL}
       headers:
         Content-Type: "application/json"
-        Username: "{username}"
-        Token: "{token}"
-        SM_USER_DEV: "{smUserDev}"
+        CMP_AUTH_TOKEN: "{token}"
+        Authorization: "Bearer {token}"
 
   # =============================================================================
   # CERTIFICATE ORDERS BASE - For certificate-related operations
@@ -43,9 +41,8 @@ invocationBases:
       url: ${CMP_BACKEND_URL}/api/orderextws/public/Orders
       headers:
         Content-Type: "application/json"
-        Username: "{username}"
-        Token: "{token}"
-        SM_USER_DEV: "{smUserDev}"
+        CMP_AUTH_TOKEN: "{token}"
+        Authorization: "Bearer {token}"
 
   # =============================================================================
   # ADD MORE BASES HERE FOR OTHER CMP TYPES
@@ -65,19 +62,17 @@ invocationBases:
 # =============================================================================
 # COMMON INPUT SCHEMA FRAGMENTS (for reference when adding new tools)
 # =============================================================================
-# All CMP tools should include these auth fields in their inputSchema:
+# All CMP tools should include this auth field in their inputSchema:
 #
-#   username:
-#     type: string
-#     description: "Your CMP username"
 #   token:
 #     type: string
 #     description: "Authentication token for the CMP API"
-#   smUserDev:
-#     type: string
-#     description: "SM_USER_DEV identifier"
 #
-# And include them in required: [username, token, smUserDev, ...]
+# The token is used to populate both headers:
+#   - CMP_AUTH_TOKEN: {token}
+#   - Authorization: Bearer {token}
+#
+# And include it in required: [token, ...]
 
 tools:
   # ===========================================================================
@@ -96,32 +91,28 @@ tools:
       - templateAliasDEV (certificate template)
       - ApplicationOwner
       - location, stateprovince, countryC
+      
+      Note: The token is used for authentication headers (CMP_AUTH_TOKEN and Authorization Bearer).
     inputSchema:
       type: object
       properties:
-        # --- AUTH FIELDS (common to all CMP tools) ---
-        username:
-          type: string
-          description: "Your CMP username (e.g., RA41425)"
+        # --- AUTH FIELD ---
         token:
           type: string
-          description: "Authentication token for the CMP API"
-        smUserDev:
-          type: string
-          description: "SM_USER_DEV identifier (e.g., 0000000003)"
-        # --- TOOL-SPECIFIC FIELDS ---
+          description: "Authentication token for the CMP API (used in CMP_AUTH_TOKEN and Authorization headers)"
+        # --- ORDER FIELDS ---
         orderByGeid:
           type: string
           description: "GEID of the person placing the order"
         orderForGeid:
           type: string
           description: "GEID of the person the order is for (can be same as orderByGeid)"
-        productxd:
+        productId:
           type: string
-          description: "Product identifier (e.g., 1234_1234_GLOBAL)"
+          description: "Product identifier (e.g., 39673_523779_GLOBAL)"
         productName:
           type: string
-          description: "Product name (e.g., Next Generation - Certificate management)"
+          description: "Product name (e.g., Next Generation CORTOSIS - Certificate management)"
         questionnaire:
           type: array
           description: "Array of questionnaire responses for the certificate order"
@@ -130,13 +121,13 @@ tools:
             properties:
               dataKey:
                 type: string
-                description: "Unique identifier for the field (e.g., 39673_523779_5458503)"
+                description: "Unique identifier for the field (e.g., 39673_523779_5458583)"
               key:
                 type: string
                 description: "Field name (e.g., Environment, commonName, location)"
-              isHidden:
+              IsHidden:
                 type: string
-                description: "Whether the field is hidden (true or false as string)"
+                description: "Whether the field is hidden ('true' or 'false' as string)"
               value:
                 type: array
                 description: "Array containing the field value(s)"
@@ -151,25 +142,15 @@ tools:
             required:
               - dataKey
               - key
-              - isHidden
+              - IsHidden
               - value
-        locationIdOrderFor:
-          type: string
-          description: "Location ID for the order (e.g., 37750)"
-        geoIdOrderFor:
-          type: string
-          description: "Geographic region for the order (e.g., USA)"
       required:
-        - username
         - token
-        - smUserDev
         - orderByGeid
         - orderForGeid
-        - productxd
+        - productId
         - productName
         - questionnaire
-        - locationIdOrderFor
-        - geoIdOrderFor
     invocation:
       extends:
         from: baseCertOrders
@@ -193,24 +174,16 @@ tools:
     inputSchema:
       type: object
       properties:
-        # --- AUTH FIELDS (required for all tools) ---
-        username:
-          type: string
-          description: "Your CMP username"
+        # --- AUTH FIELD ---
         token:
           type: string
           description: "Authentication token for the CMP API"
-        smUserDev:
-          type: string
-          description: "SM_USER_DEV identifier"
         # --- TOOL-SPECIFIC FIELDS ---
         orderId:
           type: string
           description: "The order ID to check status for (e.g., ORD-12345)"
       required:
-        - username
         - token
-        - smUserDev
         - orderId
     invocation:
       extends:
