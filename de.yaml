@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: genmcp-demo
+  labels:
+    app: genmcp-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: genmcp-demo
+  template:
+    metadata:
+      labels:
+        app: genmcp-demo
+    spec:
+      containers:
+      - name: genmcp-demo
+        image: <your-image-here>
+        ports:
+        - containerPort: <your-port-here from mcpserver.yaml>
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: genmcp-demo
+  labels:
+    app: genmcp-demo
+spec:
+  selector:
+    app: genmcp-demo
+  ports:
+  - port: 80
+    targetPort: <your-port-here>
+    protocol: TCP
+    name: http
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: genmcp-demo
+  labels:
+    app: genmcp-demo
+spec:
+  to:
+    kind: Service
+    name: genmcp-demo
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
