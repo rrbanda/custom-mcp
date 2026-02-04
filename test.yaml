@@ -1,0 +1,12 @@
+- name: secureSSO_policy_modify
+  title: 'SecureSSO Policy Modify'
+  description: |
+    ...
+  inputSchema:
+    type: object
+    properties:
+      ...
+  invocation:
+    base: baseNetworkCmp
+    http:
+      bodyRoot: orderRequests    # <-- ADD THESE 2 LINES
