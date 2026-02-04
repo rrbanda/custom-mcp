@@ -19,6 +19,7 @@ This MCP server is designed for **process automation** - any workflow that requi
 | Server | Description | Directory |
 |--------|-------------|-----------|
 | **Process Tools** | Multi-purpose process automation tools | [`cmp/`](./cmp/) |
+| **Marketplace Order** | Create orders in Marketplace API (SecureSSO, etc.) | [`marketplace-order/`](./marketplace-order/) |
 
 ---
 
@@ -138,6 +139,7 @@ See [`cmp/README.md`](./cmp/README.md) for detailed configuration instructions.
 For detailed documentation on each MCP server, see:
 
 - **Process Tools Server**: [`cmp/README.md`](./cmp/README.md)
+- **Marketplace Order Server**: [`marketplace-order/README.md`](./marketplace-order/README.md)
 
 ---
 

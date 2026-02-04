@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/rrbanda/gen-mcp/refs/heads/main/specs/mcpserver-schema.json
+kind: MCPServerConfig
+schemaVersion: "0.2.0"
+runtime:
+  transportProtocol: streamablehttp
+  streamableHttpConfig:
+    # Port 8080 is standard for OpenShift containers
+    port: 8080
+    basePath: /mcp
+  loggingConfig:
+    level: info
+    encoding: json
+    enableMcpLogs: true
