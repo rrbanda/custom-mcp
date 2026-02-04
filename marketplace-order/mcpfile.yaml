@@ -1,107 +1,39 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/rrbanda/gen-mcp/refs/heads/main/specs/mcpfile-schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/genmcp/gen-mcp/refs/heads/main/specs/mcpfile-schema.json
 
 kind: MCPToolDefinitions
 schemaVersion: "0.2.0"
 name: marketplace-order-api
 version: "1.0.0"
-instructions: |
-  This server provides tools to interact with the Marketplace Order API.
-  
-  Use create_order to submit orders to the Marketplace. The tool accepts the full
-  order payload as an array of order objects.
-  
-  Required environment variables for authentication:
-  - MARKETPLACE_USERNAME: Your marketplace username
-  - MARKETPLACE_TOKEN: Your API token  
-  - MARKETPLACE_SM_USER: SM_USER_DEV value
-  - MARKETPLACE_AUTH: Authorization header value
 
 tools:
   - name: create_order
     title: "Create Marketplace Order"
-    description: |
-      Creates a new order in the Marketplace API.
-      
-      Pass an 'orders' array containing order objects. Each order object should have:
-      - orderByGeid: GEID of the person placing the order
-      - orderForGeid: GEID of the person the order is for
-      - productId: The product identifier (e.g., "57097_20447_GLOBAL")
-      - productName: Human-readable product name (e.g., "SecureSSO - Policy Modify")
-      - questionnaire: Array of questionnaire items with dataKey, key, IsHidden, and value
-      - orderForUsers: Array with location/geo information
+    description: "Creates a new order in the Marketplace API for SecureSSO Policy Modify and other products."
     inputSchema:
       type: object
       properties:
         orders:
           type: array
-          description: "Array of order objects to create"
+          description: "Array of order objects"
           items:
             type: object
             properties:
               orderByGeid:
                 type: string
-                description: "GEID of the person placing the order"
               orderForGeid:
                 type: string
-                description: "GEID of the person the order is for"
               productId:
                 type: string
-                description: "Product identifier (e.g., '57097_20447_GLOBAL' for SecureSSO Policy Modify)"
               productName:
                 type: string
-                description: "Product name (e.g., 'SecureSSO - Policy Modify')"
               questionnaire:
                 type: array
-                description: "Array of questionnaire field entries"
                 items:
                   type: object
-                  properties:
-                    dataKey:
-                      type: string
-                      description: "Unique data key identifier"
-                    key:
-                      type: string
-                      description: "Field name/key"
-                    IsHidden:
-                      type: string
-                      description: "Whether field is hidden ('true' or 'false')"
-                    value:
-                      type: array
-                      items:
-                        type: string
-                      description: "Array of values for this field"
-                    searchInput:
-                      type: string
-                      description: "Optional search input value"
-                    autoPopulated:
-                      type: boolean
-                      description: "Whether this field was auto-populated"
-                  required:
-                    - dataKey
-                    - key
-                    - value
               orderForUsers:
                 type: array
-                description: "Array of user location information"
                 items:
                   type: object
-                  properties:
-                    locationIdOrderFor:
-                      type: string
-                      description: "Location ID"
-                    geoIdOrderFor:
-                      type: string
-                      description: "Geographic region (USA, EMEA, APAC)"
-                    orderForGeid:
-                      type: string
-                      description: "GEID of the user"
-            required:
-              - orderByGeid
-              - orderForGeid
-              - productId
-              - productName
-              - questionnaire
-              - orderForUsers
       required:
         - orders
     invocation:
@@ -111,7 +43,11 @@ tools:
         bodyRoot: orders
         headers:
           Host: marketplace.dev.citigroup.net
-          Username: "${MARKETPLACE_USERNAME}"
-          Token: "${MARKETPLACE_TOKEN}"
-          SM_USER_DEV: "${MARKETPLACE_SM_USER}"
-          Authorization: "${MARKETPLACE_AUTH}"
+          Content-Type: application/json
+          # ========================================
+          # REPLACE THESE WITH YOUR ACTUAL VALUES:
+          # ========================================
+          Username: "YOUR_USERNAME_HERE"
+          Token: "YOUR_TOKEN_HERE"
+          SM_USER_DEV: "YOUR_SM_USER_HERE"
+          Authorization: "YOUR_AUTH_HERE"
