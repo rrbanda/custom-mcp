@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/genmcp/gen-mcp/refs/heads/main/specs/mcpfile-schema.json
+# TEST VERSION - Points to mock server on localhost:9999
 
 kind: MCPToolDefinitions
 schemaVersion: "0.2.0"
@@ -81,15 +82,11 @@ tools:
     invocation:
       http:
         method: POST
-        url: https://marketplace.dev.citigroup.net/api/orderextws/public/Orders/createOrder
+        url: http://localhost:9999/api/orderextws/public/Orders/createOrder
         bodyRoot: orders
         headers:
-          Host: marketplace.dev.citigroup.net
           Content-Type: application/json
-          # ========================================
-          # REPLACE THESE WITH YOUR ACTUAL VALUES:
-          # ========================================
-          Username: "YOUR_USERNAME_HERE"
-          Token: "YOUR_TOKEN_HERE"
-          SM_USER_DEV: "YOUR_SM_USER_HERE"
-          Authorization: "YOUR_AUTH_HERE"
+          Username: "test-user"
+          Token: "test-token"
+          SM_USER_DEV: "test-sm-user"
+          Authorization: "Bearer test-auth"
